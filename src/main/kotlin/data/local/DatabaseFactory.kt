@@ -6,26 +6,26 @@ import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
 
-object DatabaseFactory {
+object DatabaseFactory{
 
-    fun init() {
+    fun init(url: String, driver: String, databaseName: String ,user: String, passwd: String) {
 
-        createDatabaseIFNotExists()
-        val dataSource = hikari()
+        createDatabaseIFNotExists(url, driver, databaseName ,user, passwd)
+        val dataSource = hikari(url, driver, databaseName, user, passwd)
         val database = Database.connect(dataSource)
         createSchema(database)
     }
 
-    private fun createDatabaseIFNotExists() {
+    private fun createDatabaseIFNotExists(url: String, driver: String, nameDB: String ,user: String, passwd: String) {
         val db = Database.connect(
-            url = "jdbc:mariadb://localhost:3307/",
-            driver = "org.mariadb.jdbc.Driver",
-            user = "root",
-            password = ""
+            url = url,
+            driver = driver,
+            user = user,
+            password = passwd
         )
 
         transaction(db) {
-            exec("CREATE DATABASE IF NOT EXISTS `order-kotlin` ")
+            exec("CREATE DATABASE IF NOT EXISTS `$nameDB`")
             exec("SET FOREIGN_KEY_CHECKS = 1;")
         }
     }
@@ -36,12 +36,12 @@ object DatabaseFactory {
         }
     }
 
-    private fun hikari(): HikariDataSource {
+    private fun hikari(url: String, driver: String, databaseName: String,user: String, passwd: String): HikariDataSource {
         val config = HikariConfig().apply {
-            jdbcUrl = "jdbc:mariadb://localhost:3307/order-kotlin?useSSL=false&serverTimezone=UTC"
-            driverClassName = "org.mariadb.jdbc.Driver"
-            username = "root"
-            password = ""
+            jdbcUrl = "$url$databaseName?useSSL=false&serverTimezone=UTC"
+            driverClassName = driver
+            username = user
+            password = passwd
             maximumPoolSize = 10
             isAutoCommit = false
             transactionIsolation = "TRANSACTION_REPEATABLE_READ"
