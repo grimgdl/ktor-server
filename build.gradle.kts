@@ -1,3 +1,5 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
 val kotlin_version: String by project
 val logback_version: String by project
 
@@ -51,10 +53,18 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-jdbc:0.50.1")
     implementation("org.mariadb.jdbc:mariadb-java-client:3.3.2")
     implementation("com.zaxxer:HikariCP:5.1.0")
+
+
+    implementation("org.flywaydb:flyway-core:10.12.0")
+    implementation("org.flywaydb:flyway-mysql:10.12.0")
 }
 
 tasks.withType<JavaCompile> {
     sourceCompatibility = JavaVersion.VERSION_17.toString()
     targetCompatibility = JavaVersion.VERSION_17.toString()
 
+}
+
+tasks.withType<ShadowJar> {
+    exclude("application-dev.yaml")
 }

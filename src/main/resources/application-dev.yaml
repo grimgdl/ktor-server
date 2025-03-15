@@ -11,6 +11,7 @@ ktor:
     password: ""
     driver: "org.mariadb.jdbc.Driver"
 jwt:
-  domain: "https://jwt-provider-domain/"
-  audience: "jwt-audience"
+  domain: "https://grimgdl.ddns.net/"
+  audience: "ktor api"
   realm: "ktor sample app"
+  secret: "23378b095d80007bc17a612eb36384eaa116f3512da2de78377a9266ba4ec09f"
