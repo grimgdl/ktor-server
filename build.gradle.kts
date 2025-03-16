@@ -70,6 +70,6 @@ tasks.withType<JavaCompile> {
 
 }
 
-tasks.withType<ShadowJar> {
-    exclude("application-dev.yaml")
-}
+//tasks.withType<ShadowJar> {
+//    exclude("application-dev.yaml")
+//}

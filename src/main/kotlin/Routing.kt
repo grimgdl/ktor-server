@@ -12,6 +12,7 @@ import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
 import io.ktor.server.config.*
+import io.ktor.server.http.content.*
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
@@ -21,6 +22,7 @@ import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.mindrot.jbcrypt.BCrypt
+import java.io.File
 import java.util.*
 
 
@@ -114,12 +116,22 @@ fun Application.configureRouting(config: ApplicationConfig) {
                 )
             )
         }
-        get("/") {
-            call.respondText("Landing page")
+
+
+
+        route("/") {
+            singlePageApplication {
+                useResources = false
+                defaultPage = "index.html"
+                react("react")
+            }
+
+            staticFiles("/", File("react"))
+
         }
-        get("{...}") {
-            call.respond(HttpStatusCode.NotFound, "not found \uD83D\uDE21")
-        }
+
+
+
     }
 }
 
