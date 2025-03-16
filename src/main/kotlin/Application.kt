@@ -11,12 +11,8 @@ fun Application.module() {
     val env = System.getenv("APP_ENV") ?: ""
     val configFile = if ("dev" in env) "application-dev.yaml" else "application.yaml"
     val config = ApplicationConfig(configFile)
-
-    val token = JwtUtils.generateToken(config = config, userName = "grimgdl")
-    println("token $token")
-
     configurationDatabase(config)
     configureSecurity(config)
     configureSockets()
-    configureRouting()
+    configureRouting(config)
 }

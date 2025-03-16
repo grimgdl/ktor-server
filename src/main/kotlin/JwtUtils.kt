@@ -7,22 +7,31 @@ import java.util.*
 
 object JwtUtils {
 
-    fun generateToken(config: ApplicationConfig, userName: String):String {
+
+    enum class TokenType {
+        ACCESS,
+        REFRESH
+    }
+
+    fun generateToken(config: ApplicationConfig, uuid: String, role: String, tokenType: TokenType):String {
 
         val jwtDomain = config.property("jwt.domain").getString()
         val jwtAudience = config.property("jwt.audience").getString()
         val jwtSecret = config.property("jwt.secret").getString()
-        val expirationTime = System.currentTimeMillis() + 3_600_000 * 4
-        val claim = "user.create,user.show,user.delete"
+        val expirationTime = when (tokenType) {
+            TokenType.ACCESS -> System.currentTimeMillis() + 3_600_000 * 4
+            TokenType.REFRESH -> System.currentTimeMillis() + ((3_600_000 * 24) * 60 )
+        }
 
         return JWT.create()
             .withAudience(jwtAudience)
-            .withSubject(userName)
-            .withClaim("role", claim)
+            .withSubject(uuid)
+            .withClaim("role", role)
             .withIssuer(jwtDomain)
             .withIssuedAt(Date())
             .withExpiresAt(Date(expirationTime))
             .sign(Algorithm.HMAC256(jwtSecret))
     }
+
 
 }

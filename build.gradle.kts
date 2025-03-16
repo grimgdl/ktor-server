@@ -39,6 +39,8 @@ dependencies {
     implementation("ch.qos.logback:logback-classic:$logback_version")
     implementation("io.ktor:ktor-server-config-yaml")
     implementation("io.ktor:ktor-serialization-gson:3.1.1")
+    implementation("io.ktor:ktor-server-cors:3.1.1")
+    implementation("io.ktor:ktor-server-request-validation:3.1.1")
     testImplementation("io.ktor:ktor-server-test-host")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
 
@@ -57,6 +59,9 @@ dependencies {
 
     implementation("org.flywaydb:flyway-core:10.12.0")
     implementation("org.flywaydb:flyway-mysql:10.12.0")
+
+    implementation("org.mindrot:jbcrypt:0.4")
+
 }
 
 tasks.withType<JavaCompile> {

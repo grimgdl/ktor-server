@@ -5,7 +5,6 @@ import io.ktor.server.application.*
 import io.ktor.server.config.*
 import org.flywaydb.core.Flyway
 
-
 fun Application.configurationDatabase(config: ApplicationConfig) {
     val url = config.property("ktor.database.url").getString()
     val nameDB = config.property("ktor.database.name").getString()
@@ -19,8 +18,10 @@ fun Application.configurationDatabase(config: ApplicationConfig) {
         println("Error in database ${e.message}")
     }
 
+
     Flyway.configure()
         .dataSource("$url$nameDB", user, password)
+        .baselineOnMigrate(true)
         .load()
         .migrate()
 
