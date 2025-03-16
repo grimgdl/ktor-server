@@ -6,6 +6,7 @@ import com.grimco.data.local.dto.JsonResponse
 import com.grimco.data.local.dto.LoginDTO
 import com.grimco.data.local.dto.LoginSuccessDTO
 import com.grimco.data.local.dto.UserSignUPDTO
+import com.grimco.routes.apiRoutes
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
@@ -37,101 +38,16 @@ fun Application.configureRouting(config: ApplicationConfig) {
 //    install(RoleBasedAuthorizationPlugin)
 
     routing {
-        authorized(Role.ADMIN.name) {
 
-            get("/run") {
-                call.respond("run")
-            }
-
-            get("/run2") {
-                call.respond("run 2")
-            }
-            post("/signup") {
-                try {
-                    val userData = call.receive<UserSignUPDTO>()
-                    val userId = transaction {
-
-                        Users.insert {
-                            it[name] = userData.name
-                            it[password] = BCrypt.hashpw(userData.password, BCrypt.gensalt()).toString()
-                            it[username] = userData.user
-                            it[uuid] = UUID.randomUUID().toString()
-                            it[role] = userData.role
-                        }
-
-                    }
-                    call.respondText("Created")
-                } catch (e: Exception) {
-                    call.respond(HttpStatusCode.Conflict, "NOt created")
-                }
-            }
-
-            get("/users") {
-                val users: List<UsersDTO> = transaction {
-                    Users.selectAll().map { row ->
-                        UsersDTO(
-                            id = row[Users.id],
-                            name = row[Users.name]
-                        )
-                    }
-                }
-                call.respond(
-                    JsonResponse(
-                        body = users,
-                        status = HttpStatusCode.OK.value
-                    )
-                )
-            }
-        }
-        get("/test") {
-            val principal = call.principal<JWTPrincipal>()
-            println("test $principal")
-        }
-
-        post("/login") {
-            val dataLogin = call.receive<LoginDTO>()
-            val user = transaction {
-                Users.selectAll()
-                    .where { Users.username eq dataLogin.username}
-                    .singleOrNull()
-            }
-            if (user == null) {
-                call.respond(HttpStatusCode.Unauthorized, "Access Deny")
-                return@post
-            }
-
-            if(!BCrypt.checkpw(dataLogin.password, user[Users.password])){
-                call.respond(HttpStatusCode.Unauthorized, "Access Deny")
-                return@post
-            }
-            val role = Role.entries[user[Users.role] ?: Role.USER.ordinal].name
-            val accessToken = JwtUtils.generateToken(config, user[Users.uuid], role, JwtUtils.TokenType.ACCESS)
-            val refreshToken = JwtUtils.generateToken(config, user[Users.uuid], role, JwtUtils.TokenType.REFRESH)
-            call.respond(
-                HttpStatusCode.OK,
-                LoginSuccessDTO(
-                    uuid = user[Users.uuid],
-                    accessToken = accessToken,
-                    refreshToken = refreshToken
-                )
-            )
-        }
-
-
+        apiRoutes(config)
 
         route("/") {
+            val isDev = System.getenv("APP_ENV")?.contains("dev") ?: false
+            val filesPath = if(isDev) "D:\\Projects\\Server\\react" else "react"
             singlePageApplication {
-                useResources = false
-                defaultPage = "index.html"
-                react("react")
+                react(filesPath)
             }
-
-            staticFiles("/", File("react"))
-
         }
-
-
-
     }
 }
 
@@ -163,7 +79,7 @@ suspend fun ApplicationCall.requireRol(roles: Set<String>) {
     }
 }
 
-private fun Route.authorized(
+fun Route.authorized(
     vararg hasAnyRole: String,
     build: Route.() -> Unit
 ) {

@@ -70,6 +70,9 @@ tasks.withType<JavaCompile> {
 
 }
 
-//tasks.withType<ShadowJar> {
+tasks.withType<Jar>{
+    destinationDirectory = file("D:\\Projects\\Server")
+}
+tasks.withType<ShadowJar> {
 //    exclude("application-dev.yaml")
-//}
+}
