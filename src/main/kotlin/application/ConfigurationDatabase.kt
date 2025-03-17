@@ -1,4 +1,4 @@
-package com.grimco
+package com.grimco.application
 
 import com.grimco.data.local.DatabaseFactory
 import io.ktor.server.application.*

@@ -1,14 +1,13 @@
-package com.grimco.routes
+package com.grimco.presentation.routes
 
-import com.grimco.JwtUtils
-import com.grimco.Role
-import com.grimco.authorized
+import com.grimco.application.Role
+import com.grimco.application.authorized
 import com.grimco.data.local.Users
 import com.grimco.data.local.UsersDTO
 import com.grimco.data.local.dto.JsonResponse
 import com.grimco.data.local.dto.LoginDTO
-import com.grimco.data.local.dto.LoginSuccessDTO
 import com.grimco.data.local.dto.UserSignUPDTO
+import com.grimco.domain.service.AuthService
 import io.ktor.http.*
 import io.ktor.server.config.*
 import io.ktor.server.request.*
@@ -20,11 +19,10 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import org.mindrot.jbcrypt.BCrypt
 import java.util.*
 
-fun Route.apiRoutes(config: ApplicationConfig) {
-
+fun Route.apiRoutes(authService: AuthService, config: ApplicationConfig) {
     route("/api") {
 
-        authorized(Role.ADMIN.name) {
+        authorized(Role.ADMIN.name, config = config) {
 
             post("/signup") {
                 val userData = call.receive<UserSignUPDTO>()
@@ -67,31 +65,7 @@ fun Route.apiRoutes(config: ApplicationConfig) {
 
         post("/login") {
             val dataLogin = call.receive<LoginDTO>()
-            val user = transaction {
-                Users.selectAll()
-                    .where { Users.username eq dataLogin.username }
-                    .singleOrNull()
-            }
-            if (user == null) {
-                call.respond(HttpStatusCode.Unauthorized, "Access Deny")
-                return@post
-            }
-
-            if (!BCrypt.checkpw(dataLogin.password, user[Users.password])) {
-                call.respond(HttpStatusCode.Unauthorized, "Access Deny")
-                return@post
-            }
-            val role = Role.entries[user[Users.role] ?: Role.USER.ordinal].name
-            val accessToken = JwtUtils.generateToken(config, user[Users.uuid], role, JwtUtils.TokenType.ACCESS)
-            val refreshToken = JwtUtils.generateToken(config, user[Users.uuid], role, JwtUtils.TokenType.REFRESH)
-            call.respond(
-                HttpStatusCode.OK,
-                LoginSuccessDTO(
-                    uuid = user[Users.uuid],
-                    accessToken = accessToken,
-                    refreshToken = refreshToken
-                )
-            )
+            authService.login(call, dataLogin)
         }
 
     }

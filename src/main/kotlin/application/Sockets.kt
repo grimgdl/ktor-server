@@ -1,4 +1,4 @@
-package com.grimco
+package com.grimco.application
 
 import io.ktor.server.application.*
 import io.ktor.server.auth.*

@@ -1,6 +1,6 @@
 package com.grimco.data.local.dto
 
-import com.grimco.Role
+import com.grimco.application.Role
 import kotlinx.serialization.Serializable
 
 

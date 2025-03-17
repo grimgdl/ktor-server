@@ -41,6 +41,8 @@ dependencies {
     implementation("io.ktor:ktor-serialization-gson:3.1.1")
     implementation("io.ktor:ktor-server-cors:3.1.1")
     implementation("io.ktor:ktor-server-request-validation:3.1.1")
+    implementation("io.insert-koin:koin-ktor:3.5.6")
+    implementation("io.ktor:ktor-server-sessions:3.1.1")
     testImplementation("io.ktor:ktor-server-test-host")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
 
@@ -61,6 +63,9 @@ dependencies {
     implementation("org.flywaydb:flyway-mysql:10.12.0")
 
     implementation("org.mindrot:jbcrypt:0.4")
+
+    implementation("io.insert-koin:koin-ktor:3.5.0")
+    implementation("io.insert-koin:koin-logger-slf4j:3.5.0")
 
 }
 

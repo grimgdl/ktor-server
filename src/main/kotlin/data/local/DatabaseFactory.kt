@@ -1,11 +1,10 @@
 package com.grimco.data.local
 
-import com.grimco.Role
+import com.grimco.application.Role
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
-import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.insertIgnore
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.mindrot.jbcrypt.BCrypt

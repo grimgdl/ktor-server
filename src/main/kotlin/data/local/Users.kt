@@ -1,6 +1,6 @@
 package com.grimco.data.local
 
-import com.grimco.Role
+import com.grimco.application.Role
 import kotlinx.serialization.Serializable
 import org.jetbrains.exposed.sql.Table
 

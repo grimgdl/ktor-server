@@ -1,4 +1,4 @@
-package com.grimco
+package com.grimco.application
 
 enum class Role {
     ADMIN,
