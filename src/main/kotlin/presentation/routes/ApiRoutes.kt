@@ -73,27 +73,19 @@ fun Route.apiRoutes(authService: AuthService, config: ApplicationConfig) {
             var fileName = ""
             var fileDescription = ""
             val multipart = call.receiveMultipart()
-
+            var fileSaved = false
             multipart.forEachPart { part ->
                 when(part){
                     is PartData.FileItem -> {
-                        println("file item ${part.originalFileName}")
                         val name = part.originalFileName.toString().split(".")
                         fileName = "${name.first()}${UUID.randomUUID()}.${name.last()}"
-                        println("filename $fileName")
                         val fileByte = part.provider().readRemaining().readByteArray()
                         val file = File("D:\\images", fileName)
-
                         file.writeBytes(fileByte)
-
-                        if(file.exists()) {
-                            call.respond(HttpStatusCode.OK, "Uploaded")
-                        }else{
-                            call.respond(HttpStatusCode.Conflict, "Failed")
+                        if (file.exists()) {
+                            fileSaved = true
                         }
-
                     }
-
                     is PartData.FormItem -> {
                         println("file form ${part.value}")
                         fileDescription = part.value
@@ -105,6 +97,11 @@ fun Route.apiRoutes(authService: AuthService, config: ApplicationConfig) {
                 part.dispose()
             }
 
+            if(!fileSaved) {
+                call.respond(HttpStatusCode.BadRequest, "Failed")
+                return@post
+            }
+            call.respond(HttpStatusCode.OK, "Uploaded")
         }
 
 
