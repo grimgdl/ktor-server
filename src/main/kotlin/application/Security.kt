@@ -8,8 +8,10 @@ import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
 import io.ktor.server.config.*
 import io.ktor.server.response.*
+import org.koin.ktor.ext.inject
 
-fun Application.configureSecurity(config: ApplicationConfig) {
+fun Application.configureSecurity() {
+    val config by inject<ApplicationConfig>()
     val jwtAudience = config.property("jwt.audience").getString()
     val jwtDomain = config.property("jwt.domain").getString()
     val jwtRealm = config.property("jwt.realm").getString()

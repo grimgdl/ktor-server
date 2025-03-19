@@ -11,7 +11,6 @@ import com.grimco.domain.service.AuthService
 import io.ktor.http.*
 import io.ktor.http.content.*
 import io.ktor.server.config.*
-import io.ktor.server.http.content.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -72,36 +71,41 @@ fun Route.apiRoutes(authService: AuthService, config: ApplicationConfig) {
         post("/upload"){
             var fileName = ""
             var fileDescription = ""
-            val multipart = call.receiveMultipart()
-            var fileSaved = false
-            multipart.forEachPart { part ->
-                when(part){
-                    is PartData.FileItem -> {
-                        val name = part.originalFileName.toString().split(".")
-                        fileName = "${name.first()}${UUID.randomUUID()}.${name.last()}"
-                        val fileByte = part.provider().readRemaining().readByteArray()
-                        val file = File("D:\\images", fileName)
-                        file.writeBytes(fileByte)
-                        if (file.exists()) {
-                            fileSaved = true
+            try {
+                val multipart = call.receiveMultipart()
+                var fileSaved = false
+
+                multipart.forEachPart { part ->
+                    when(part){
+                        is PartData.FileItem -> {
+                            val name = part.originalFileName.toString().split(".")
+                            fileName = "${name.first()}${UUID.randomUUID()}.${name.last()}"
+                            val fileByte = part.provider().readRemaining().readByteArray()
+                            val file = File("D:\\images", fileName)
+                            file.writeBytes(fileByte)
+                            if (file.exists()) {
+                                fileSaved = true
+                            }
+                        }
+                        is PartData.FormItem -> {
+                            println("file form ${part.value}")
+                            fileDescription = part.value
+                        }
+                        else -> {
+                            println("something else")
                         }
                     }
-                    is PartData.FormItem -> {
-                        println("file form ${part.value}")
-                        fileDescription = part.value
-                    }
-                    else -> {
-                        println("something else")
-                    }
+                    part.dispose()
                 }
-                part.dispose()
-            }
 
-            if(!fileSaved) {
-                call.respond(HttpStatusCode.BadRequest, "Failed")
-                return@post
+                if(!fileSaved) {
+                    call.respond(HttpStatusCode.BadRequest, "Failed")
+                    return@post
+                }
+                call.respond(HttpStatusCode.OK, "Uploaded")
+            } catch (e: Exception) {
+                call.respond(HttpStatusCode.BadRequest, "Error")
             }
-            call.respond(HttpStatusCode.OK, "Uploaded")
         }
 
 

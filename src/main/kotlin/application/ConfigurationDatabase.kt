@@ -4,8 +4,12 @@ import com.grimco.data.local.DatabaseFactory
 import io.ktor.server.application.*
 import io.ktor.server.config.*
 import org.flywaydb.core.Flyway
+import org.koin.ktor.ext.inject
 
-fun Application.configurationDatabase(config: ApplicationConfig) {
+fun Application.configurationDatabase() {
+
+    val config by inject<ApplicationConfig>()
+
     val url = config.property("ktor.database.url").getString()
     val nameDB = config.property("ktor.database.name").getString()
     val driver = config.property("ktor.database.driver").getString()

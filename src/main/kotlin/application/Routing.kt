@@ -2,7 +2,7 @@ package com.grimco.application
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
-import com.grimco.domain.service.AuthService
+import com.grimco.data.local.dto.JsonDefault
 import com.grimco.presentation.routes.apiRoutes
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
@@ -15,11 +15,8 @@ import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.serialization.json.Json
-import org.koin.java.KoinJavaComponent
-import org.koin.java.KoinJavaComponent.inject
 import org.koin.ktor.ext.get
 import org.koin.ktor.ext.inject
-
 
 
 fun Application.configureRouting() {
@@ -33,9 +30,10 @@ fun Application.configureRouting() {
     }
 
     routing {
-
         apiRoutes(application.get(), config)
-
+        get("/grimgdl") {
+            call.respond(JsonDefault(message = "no content", code = HttpStatusCode.OK.value))
+        }
         route("/") {
             val isDev = System.getenv("APP_ENV")?.contains("dev") ?: false
             val filesPath = if (isDev) "D:\\Projects\\Server\\frontend\\dist" else "react"
