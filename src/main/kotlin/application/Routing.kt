@@ -38,7 +38,7 @@ fun Application.configureRouting() {
 
         route("/") {
             val isDev = System.getenv("APP_ENV")?.contains("dev") ?: false
-            val filesPath = if (isDev) "D:\\Projects\\Server\\react" else "react"
+            val filesPath = if (isDev) "D:\\Projects\\Server\\frontend\\dist" else "react"
             singlePageApplication {
                 react(filesPath)
             }
