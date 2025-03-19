@@ -5,12 +5,14 @@ import com.auth0.jwt.algorithms.Algorithm
 import com.grimco.data.local.dto.JsonDefault
 import com.grimco.presentation.routes.apiRoutes
 import io.ktor.http.*
+import io.ktor.http.content.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
 import io.ktor.server.config.*
 import io.ktor.server.http.content.*
+import io.ktor.server.plugins.cachingheaders.*
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -35,11 +37,23 @@ fun Application.configureRouting() {
             call.respond(JsonDefault(message = "no content", code = HttpStatusCode.OK.value))
         }
         route("/") {
+            install(CachingHeaders) {
+                options { _, outgoingContent ->
+                    when (outgoingContent.contentType?.withoutParameters()) {
+                        ContentType.Text.CSS -> CachingOptions(CacheControl.MaxAge(maxAgeSeconds = 24 * 60 * 60))
+                        ContentType.Text.JavaScript -> CachingOptions(CacheControl.MaxAge(maxAgeSeconds = 24 * 60 * 60))
+                        ContentType.Image.JPEG -> CachingOptions(CacheControl.MaxAge(maxAgeSeconds = 24 * 60 * 60))
+                        else -> null
+                    }
+                }
+            }
             val isDev = System.getenv("APP_ENV")?.contains("dev") ?: false
             val filesPath = if (isDev) "D:\\Projects\\Server\\frontend\\dist" else "react"
             singlePageApplication {
                 react(filesPath)
             }
+
+
         }
     }
 }
@@ -61,7 +75,7 @@ val RoleBasedAuthorizationPlugin = createRouteScopedPlugin(
         call.cookieValidation(config)
     }
 
-    on(AuthenticationChecked){ call ->
+    on(AuthenticationChecked) { call ->
         call.requireRol(roles)
     }
 

@@ -46,11 +46,10 @@ dependencies {
     testImplementation("io.ktor:ktor-server-test-host")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
 
-
     implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.5")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
     implementation("io.ktor:ktor-server-content-negotiation:2.3.5")
-
+    implementation("io.ktor:ktor-server-caching-headers:2.3.5")
 
     implementation("org.jetbrains.exposed:exposed-core:0.50.1")
     implementation("org.jetbrains.exposed:exposed-dao:0.50.1")
